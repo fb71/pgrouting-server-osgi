@@ -20,16 +20,25 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 
-	private HttpServiceTracker serviceTracker;
+    private static Activator       instance;
+    
+	private HttpServiceTracker     serviceTracker;
+	
 
-	public void start(BundleContext context) throws Exception {
+    public static Activator getInstance() {
+        return instance;
+    }
+
+    public void start(BundleContext context) throws Exception {
 		serviceTracker = new HttpServiceTracker(context);
 		serviceTracker.open();
+		instance = this;
 	}
 
 	public void stop(BundleContext context) throws Exception {
 		serviceTracker.close();
 		serviceTracker = null;
+		instance = null;
 	}
 
 }

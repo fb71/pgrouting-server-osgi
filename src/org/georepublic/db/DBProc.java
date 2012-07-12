@@ -73,7 +73,7 @@ public class DBProc {
 					while(r.next())
 						hosts.add(r.getString("host"));
 					
-					String[] h = (String[])hosts.toArray(new String[0]);
+					String[] h = hosts.toArray(new String[0]);
 					
 					retVal.setHosts(h);
 					r.close();
@@ -125,7 +125,7 @@ public class DBProc {
 		
 		String rTable = "road_profile_"+id;
 		
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder( 1024 );
 		
 		JSONObject jobj   = new JSONObject();
 		JSONObject jstat  = new JSONObject();
@@ -152,6 +152,8 @@ public class DBProc {
 		sb.append( is_reverse_cost ).append(",");
 		sb.append(RouteProperties.getBbox_dd()).append(")");
 
+		System.out.println( "SQL: " + sb.toString() );
+		long start = System.currentTimeMillis();
 		if( dbConn != null ) {
 			try {				
 				Connection conn = dbConn.getConnection();
@@ -178,6 +180,8 @@ public class DBProc {
 					jfeat.put("properties", jprop);
 					jfeats.add(jfeat);
 				}
+				
+				System.out.println( "   " + (System.currentTimeMillis()-start) + "ms" );
 				
 				rs.close();
 				stmt.close();

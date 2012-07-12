@@ -14,7 +14,11 @@
  */
 package org.georepublic.properties;
 
-import java.util.ResourceBundle;
+import java.util.Properties;
+
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * @author mbasa
@@ -26,14 +30,34 @@ public class AdminProperties {
 
 public static void setProperties(){
 		
-		ResourceBundle resb = 
-				ResourceBundle.getBundle("properties.administration");
+    // XXX make this a proper OSGi service so that it can use OSGi config
+    // and/or use Polymap configuration
+    ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    InputStream in = cl.getResourceAsStream( "properties/administration.properties" );
+    try {
+        Properties props = new Properties();
+        props.load( in );
+        props.putAll( System.getProperties() );
+    
+        String basename = "routing-service-osgi.admin.";
+        AdminProperties.setHttp_allowed( props.getProperty( basename + "http.allowed").split( "," ) );
+        AdminProperties.setHttp_admin_url( props.getProperty( basename + "http.admin_url" ) );
+    }
+    catch (Exception e) {
+        throw new RuntimeException( e );
+    }
+    finally {
+        IOUtils.closeQuietly( in );
+    }
 
-		AdminProperties.setHttp_allowed(
-				resb.getString("http.allowed").split(","));
-		
-		AdminProperties.setHttp_admin_url(
-				resb.getString("http.admin_url") );
+//        ResourceBundle resb = 
+//				ResourceBundle.getBundle("properties.administration");
+//
+//		AdminProperties.setHttp_allowed(
+//				resb.getString("http.allowed").split(","));
+//		
+//		AdminProperties.setHttp_admin_url(
+//				resb.getString("http.admin_url") );
 	}
 
 	public static String[] getHttp_allowed() {

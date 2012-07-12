@@ -14,7 +14,10 @@
  */
 package org.georepublic.properties;
 
-import java.util.ResourceBundle;
+import java.util.Properties;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 public class RouteProperties {
 
@@ -27,19 +30,46 @@ public class RouteProperties {
 	
 	public static void setProperties(){
 		
-		ResourceBundle resb = 
-				ResourceBundle.getBundle("properties.routing");
-		
-		RouteProperties.setSrid(Integer.parseInt(resb.getString("GEO.SRID")));		
-		RouteProperties.setTable(resb.getString("GEO.TABLE"));
-		
-		//RouteProperties.setDirected(resb.getString("GEO.DIRECTED"));
-		//RouteProperties.setReverse_cost(resb.getString("GEO.REVERSE_COST"));
-		
-		RouteProperties.setBbox_sp(Double.parseDouble(
-				resb.getString("GEO.BBOX_SP")));
-		RouteProperties.setBbox_dd(Double.parseDouble(
-				resb.getString("GEO.BBOX_DD")));
+        // XXX see DBProperties
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        InputStream in = cl.getResourceAsStream( "properties/routing.properties" );
+        try {
+            Properties props = new Properties();
+            props.load( in );
+            props.putAll( System.getProperties() );
+        
+            String basename = "routing-service-osgi.route.";
+            RouteProperties.setSrid( Integer.parseInt( props.getProperty( basename + "GEO.SRID" ) ) );      
+            RouteProperties.setTable( props.getProperty( basename + "GEO.TABLE" ) );
+            
+            //RouteProperties.setDirected(resb.getString("GEO.DIRECTED"));
+            //RouteProperties.setReverse_cost(resb.getString("GEO.REVERSE_COST"));
+            
+            RouteProperties.setBbox_sp( Double.parseDouble(
+                    props.getProperty( basename + "GEO.BBOX_SP" ) ) );
+            RouteProperties.setBbox_dd( Double.parseDouble(
+                    props.getProperty( basename + "GEO.BBOX_DD" ) ) );
+        }
+        catch (Exception e) {
+            throw new RuntimeException( e );
+        }
+        finally {
+            IOUtils.closeQuietly( in );
+        }
+
+//        ResourceBundle resb = 
+//				ResourceBundle.getBundle("properties.routing");
+//		
+//		RouteProperties.setSrid(Integer.parseInt(resb.getString("GEO.SRID")));		
+//		RouteProperties.setTable(resb.getString("GEO.TABLE"));
+//		
+//		//RouteProperties.setDirected(resb.getString("GEO.DIRECTED"));
+//		//RouteProperties.setReverse_cost(resb.getString("GEO.REVERSE_COST"));
+//		
+//		RouteProperties.setBbox_sp(Double.parseDouble(
+//				resb.getString("GEO.BBOX_SP")));
+//		RouteProperties.setBbox_dd(Double.parseDouble(
+//				resb.getString("GEO.BBOX_DD")));
 	}
 	
 	public static int getSrid() {

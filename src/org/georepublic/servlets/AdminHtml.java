@@ -43,7 +43,7 @@ public class AdminHtml extends HttpServlet {
 			}				 
 		}
 		
-		req.getRequestDispatcher("/resources/html/admin.html").forward(
+		req.getRequestDispatcher("../../../resources/html/admin.html").forward(
 					req, resp);
 		
 	}
